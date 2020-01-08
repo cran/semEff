@@ -2,7 +2,7 @@ Package: semEff
 Type: Package
 Title: Automatic Calculation of Effects for Piecewise Structural
         Equation Models
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person(given = "Mark", family = "Murphy", role = c("aut", "cre"), 
     email = "murphymv@gmail.com")
 Description: Provides functionality to automatically calculate direct, indirect, 
@@ -16,11 +16,11 @@ Imports: boot, lme4, parallel, stats, utils
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Language: en-GB
 NeedsCompilation: no
-Packaged: 2019-10-30 14:38:31 UTC; Mark
+Packaged: 2020-01-07 19:07:28 UTC; Mark
 Author: Mark Murphy [aut, cre]
 Maintainer: Mark Murphy <murphymv@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-11-04 15:10:02 UTC
+Date/Publication: 2020-01-08 20:00:03 UTC
