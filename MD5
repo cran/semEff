@@ -1,11 +1,11 @@
-797a9a66479914caf0df78d274d21b4c *DESCRIPTION
+abf0f9f4ff657bf2c42fda6fea1eed1d *DESCRIPTION
 fa79bf28afa1aa3a9a398e3ab9674e6e *NAMESPACE
-6066d940eb9d52f1ddc16730c7e2e2de *NEWS.md
+9f518746b3a55a61699b67a5441b6481 *NEWS.md
 f4e792fca0025b4428c9d0e39266d9c5 *R/boot_fun.R
 154f7c2c116ff302a9d3179ada1d2ec3 *R/data.R
 980155d53f8dff2481e164951f76318c *R/helper_fun.R
 674e5a3c7b3d5479bb54a1abd69ca11f *R/semEff-package.R
-dd910f7be285f74ada9911da2b3b0c4d *R/sem_eff_fun.R
+1cb0f7c22e06bf311d8def937d7bfc23 *R/sem_eff_fun.R
 b67f0490096cc2328b0dfa8fc65b545d *R/std_coeff_fun.R
 c1bb9e68db381696be85155308ca4e85 *README.md
 48d1b3910c346cc679defc8f9649eda8 *data/Shipley.rda
