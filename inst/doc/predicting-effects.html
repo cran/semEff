@@ -10,13 +10,23 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="Mark V. Murphy" />
 
-<meta name="date" content="2021-10-12" />
 
 <title>Predicting Effects</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -26,6 +36,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -109,13 +120,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -149,7 +167,187 @@ div.csl-indent {
 }
 </style>
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -162,18 +360,34 @@ div.csl-indent {
 
 
 <h1 class="title toc-ignore">Predicting Effects</h1>
-<h4 class="author">Mark V. Murphy</h4>
-<h4 class="date">2021-10-12</h4>
 
 
 
-<p><code>semEff</code> can be used to predict values for different types of effects in an SEM. For example, we may be interested in the predictions of an indirect effect of a variable vs. its direct effect, or we may simply wish to predict the total (combined) effect. Here we’ll use <a href="https://murphymv.github.io/semEff/reference/shipley.html">simulated data</a> from <span class="citation">Shipley (2009)</span> on tree growth and survival for a single tree species to predict and plot a direct vs. indirect effect.</p>
+<p><code>semEff</code> can be used to predict values for different types
+of effects in an SEM. For example, we may be interested in the
+predictions of an indirect effect of a variable vs. its direct effect,
+or we may simply wish to predict the total (combined) effect. Here we’ll
+use <a href="https://murphymv.github.io/semEff/reference/shipley.html">simulated
+data</a> from <span class="citation">Shipley (<a href="#ref-shipley2009" role="doc-biblioref">2009</a>)</span> on tree growth and survival for a
+single tree species to predict and plot a direct vs. indirect
+effect.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;semEff&quot;, &quot;ggplot2&quot;))</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semEff)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
 <p>Let’s preview the data (n = 1900):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(shipley))</span></code></pre></div>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="7%" />
+<col width="7%" />
+<col width="13%" />
+<col width="7%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="15%" />
+<col width="7%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="right">site</th>
@@ -256,7 +470,13 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
-<p>Tree measurements are taken for five individuals of the same species at 20 different sites every two years from 1970—2006 (repeated measures). The hypothesised SEM from <span class="citation">Shipley (2009)</span> tests the indirect effect of site latitude on tree survival (0/1), via degree days to bud burst, date of first bud burst, and tree growth. This can be fit as a series of linear and generalised linear mixed models using the <code>lme4</code> package:</p>
+<p>Tree measurements are taken for five individuals of the same species
+at 20 different sites every two years from 1970 to 2006 (repeated
+measures). The hypothesised SEM from <span class="citation">Shipley (<a href="#ref-shipley2009" role="doc-biblioref">2009</a>)</span> tests the
+indirect effect of site latitude on tree survival (0/1), via degree days
+to bud burst, date of first bud burst, and tree growth. This can be fit
+as a series of linear and generalised linear mixed models using the
+<code>lme4</code> package:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>shipley.sem <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">DD =</span> lme4<span class="sc">::</span><span class="fu">lmer</span>(DD <span class="sc">~</span> lat <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> site) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> tree), <span class="at">data =</span> shipley),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Date =</span> lme4<span class="sc">::</span><span class="fu">lmer</span>(Date <span class="sc">~</span> DD <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> site) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> tree), <span class="at">data =</span> shipley),</span>
@@ -266,7 +486,8 @@ div.csl-indent {
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>We can bootstrap estimates for these models:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>shipley.sem.boot <span class="ot">&lt;-</span> <span class="fu">bootEff</span>(shipley.sem, <span class="at">R =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">13</span>, <span class="at">ran.eff =</span> <span class="st">&quot;site&quot;</span>)</span></code></pre></div>
-<p>And use the bootstrap samples to calculate effects and confidence intervals:</p>
+<p>And use the bootstrap samples to calculate effects and confidence
+intervals:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(shipley.sem.eff <span class="ot">&lt;-</span> <span class="fu">semEff</span>(shipley.sem.boot))</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Piecewise SEM with:</span></span>
@@ -283,7 +504,10 @@ div.csl-indent {
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Live   | Endog.   |     N        N        Y     |         1         3 |</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use summary() for effects and confidence intervals for endogenous variables.</span></span></code></pre></div>
-<p>For this example, let’s compare the direct effects of <em>Date</em> (Julian date of first bud burst) vs. the indirect effects of <em>DD</em> (cumulative degree days to first bud burst, °C) on tree <em>Growth</em> (increase in stem diameter, mm):</p>
+<p>For this example, let’s compare the direct effects of <em>Date</em>
+(Julian date of first bud burst) vs. the indirect effects of <em>DD</em>
+(cumulative degree days to first bud burst, °C) on tree <em>Growth</em>
+(increase in stem diameter, mm):</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(shipley.sem.eff, <span class="st">&quot;Growth&quot;</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SEM direct, summed indirect, total, and mediator effects:</span></span>
@@ -302,10 +526,13 @@ div.csl-indent {
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                      </span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  MEDIATORS DD   |  0.165 |  0.001 |     0.048 |    0.086    0.281 | *</span></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            Date | -0.075 | -0.006 |     0.017 |   -0.109   -0.049 | *</span></span></code></pre></div>
-<p>We’ll extract the (total) effects of each variable to use for prediction:</p>
+<p>We’ll extract the (total) effects of each variable to use for
+prediction:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tot <span class="ot">&lt;-</span> <span class="fu">getTotEff</span>(shipley.sem.eff, <span class="st">&quot;Growth&quot;</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tot.b <span class="ot">&lt;-</span> <span class="fu">getTotEff</span>(shipley.sem.eff, <span class="st">&quot;Growth&quot;</span>, <span class="at">type =</span> <span class="st">&quot;boot&quot;</span>)</span></code></pre></div>
-<p>Now we can predict values for <em>Growth</em> using <a href="https://murphymv.github.io/semEff/reference/predEff.html"><code>predEff()</code></a>. We’ll need the model object, and we’ll generate 100 values of the predictors to predict from:</p>
+<p>Now we can predict values for <em>Growth</em> using <a href="https://murphymv.github.io/semEff/reference/predEff.html"><code>predEff()</code></a>.
+We’ll need the model object, and we’ll generate 100 values of the
+predictors to predict from:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(shipley)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> shipley.sem<span class="sc">$</span>Growth</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">c</span>(<span class="st">&quot;Date&quot;</span>, <span class="st">&quot;DD&quot;</span>), <span class="cf">function</span>(i) {</span>
@@ -313,7 +540,8 @@ div.csl-indent {
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="fu">predEff</span>(mod, <span class="at">newdata =</span> x, <span class="at">effects =</span> tot[i], <span class="at">eff.boot =</span> tot.b)</span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(x, f)</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>}, <span class="at">simplify =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<p>OK let’s plot the predictions. We’ll use a custom plotting function which wraps <code>ggplot2::ggplot()</code>:</p>
+<p>OK let’s plot the predictions. We’ll use a custom plotting function
+which wraps <code>ggplot2::ggplot()</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plotFit <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, fit, <span class="at">x.lab =</span> <span class="cn">NULL</span>, <span class="at">y.lab =</span> <span class="cn">NULL</span>) {</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> fit[[<span class="dv">1</span>]]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> fit<span class="sc">$</span>fit</span>
@@ -336,22 +564,38 @@ div.csl-indent {
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotFit</span>(<span class="at">x =</span> dat<span class="sc">$</span>DD, <span class="at">y =</span> dat<span class="sc">$</span>Growth, <span class="at">fit =</span> fit<span class="sc">$</span>DD, </span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">x.lab =</span> <span class="st">&quot;Degree Days to Bud Burst (indirect effect)&quot;</span>, <span class="at">y.lab =</span> <span class="st">&quot;Stem Growth (mm)&quot;</span>)</span></code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAA3lBMVEUAAAAAABoAADoAAGYAAP8AOjoAOpAAZrYzMzM6AAA6ADo6AGY6kNtNTU1NTW5NTY5NbqtNjshmAABmADpmAGZmkJBmtrZmtv9uTU1uTW5uTY5ubo5ubqtuq+SOTU2OTW6OTY6Obk2ObquOyP+QOgCQkDqQkGaQtpCQ27aQ2/+rbk2rbm6rbo6rjk2ryKur5OSr5P+2ZgC22/+2/9u2///Ijk3I///T0+3bkDrb/7bb///kq27k///l5f/r6+v/tmb/yI7/25D/27b/29v/5Kv//7b//8j//9v//+T///8c3EIRAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAXqElEQVR4nO2dCXfcthGAIdeN6sZKWvVQ0sa95B52L6uNbDXOrqxWss3//4e6AHHMiYvc1a7Mec/WEhwAg4+DwbEk1wyLZMXctwH7LguggiyACrIAKsgCqCALoII0AvrRpyOdgPRT61Leg1CIGguggsYCqKCxACpolAG9PbFyPrz/zclPvg+JCyAs737y/ceX58Pbn4aEBRCS9799Nbz/3evh9levSbatGLcPCm2ArOfcfvO9A+XnQOtPRWoAOS6bXuYBQa49F6dOwRjdpH3zIMsGeBDMthXjrIIxGUL7Bujy2ea/HccgkyM0lrBVgi2APv7V+s3Hl8+2OoqB5tYBKhNstkHSqADkO9Z250GwuXXt3x9AkmwfkHMpBcECSEjkJexNDJJk6zEopGUANVfRorB/gCSFBVBJIReDZqqipLHfgO5PYQFUq7EAKmjsPyAhDi2AgEgj2QIIyAKooLAAKiksMWgvFfYJEHORZSaNhAeZmrVYZjOkw4aMxoECMkHmsSGjsQAqaNw/INhTxo8VMeiTApQw+CbrCunwYccg3LLkCRIg7irZr8yqbajVuA9AsYXjnywgoS99OoD8X9BgGoMOGNCU+wFcC/FfTW8d+EA1TX8rcp8xKDMPTKdpBK+sYqrCjrqYCEAZxdMBAgTPB14PBpDsIrJx3EEkQGNavnm2B2YVVBskjf0FBDN73zFDBaCKGP7gACXfeWCASjEISh2gihh0UIB82dhgGGL0IE16GNJ+YICoxcBBMsM8OonG+3zz9GKzRqoa+wgo9CW5mYVB6qECwu4So01iJcwXRTk8QMxeBEhQAicMEl6cROLgYhC++oMUYjoA4VSK5FAmimPJtG0ZQKDxKRkDGmMQTlWcNCP7BEjeMKRtAm7h9kMGkAXxodQeAKAoEJAePiT34Rq0h2FEkg1FBbkZO93uMGw/DJ3ASCqcB/sm0JOrAIT2FJCmQF2hgEHARpzoAAGZECy0iVIJUB03WJlQScFIqRkioKuxtqd69lZAo3nj/+K3GiVAGreYGwCCrFA1BSPFZnBAd6eBzJV59ELJXgYkQAiAgFPEc3AisMaNZoBgyMEfQWX5yeIEQHc//zZpoQMoRUDERAkQaiNUizv1Aggna4YNWbBdQHXSA2jAsx0UmpOWAkgcwMhnVNthAYJHpHkwawAkjldZQMRpwFQzZ2SNhgjo5omr7gdK/xqaY1AGEA/XtgQTOyQGNMA0xic3zItGVmhIgD48Py5lVwHJl64SUBzm4NQGqXvjNT47AnR3egZVP748+eJV5ROHrMkpHShAn0BTlwBIajtrP/Aw2mH11Qxpvi55D0KALs/r37ygAVLOY264zUbAhIwHSrgwsh7mFuVthHUoMegaRh/7uPNQ+9RzFhBuJiXFeo0ehGGYE2tc0zLrjURFDDVB+vabv9suVvnmBcNuLDDgngMv8SgqhCPuNFCUCkE5whmeUy2r9uaFD8/hIuP2q3NLp/fNC6gLAEfAH3SnIc4TSoKlx/vNxBi0BQ/CQdq7Tt+bF2DrKgBJcQcq0gYyqooNxMQKPg1B+v0fHJmuNy9gu0NjsJUFQHjJNoif8oBKRuY15Bj0OZwiXrou1vXmBWy2YhzkQgYymLcEiI1iOZk6Dxpt82PZZgL05eu+Ny+UAYXz3GuwW6GyEg7AR62iZGReY8sbZgBQbIRMMAMoYfK6a2FurttQNDKrse0dRXjVfStEQBoMnjgAQEAVMdp6DILzIFGahvnwNwACbSFAKCCTB8ScTLGhaGRGY+7FqrInL8fYdCC2lzU/ZFwPZDlLx8vdLlYl6bh5IVofG8I9qQAo6tJc6CO3ATqXYqTajIrFqiQMULJBvbsj/m/AJ6hSRwjCAmcygBBexUgm9YtVUSggwb1xi4L5oBkpD0xS4xIuboDqvvMJgFKBcvN1mTlIc0CsSaytBBBxMiEbKoqSQhTXyKzZAeHFqij1gMS2RhWgmy412TCkCkJReUCzx6CeIJ2sS3sx0soBEaKZAyBQAgQkRqkBK4uA9ObrMneQRpMUcYKMWxnyDAP1i4FuuYLSs3ykybrCZ97FqiQdgAxoBgpCvNWcAcrLps8JVW37Z12sSlIFaJB6GGurOMrJgML5dQaQiZ002TU3oAoBgFYrbEmIIDFR7hqpgQVAqZgoa6A7wOoCK9jFREK7BRQQCXULDoFJeCVNkZUyJEBi4z0gAlZtvi7z3byw8iLXrYIhhuskSy4GiyB9eiuAbATyg1jd7S+rFUYkbdqbYPyAmhCblSWUOYKNh5VoDIFuP6CNXIzl1t1AtYLCACEbDXaI1KwcGDJLktQgIFyrTEKm1gCoLBqgDSIdEGwoShOFTY8oX6BFW71OmSS5V0CrN86P0HWtAoSs54RI8yA1AdCQ7Ub3Dmi1SiZkAOEhDFkviXAeLnEooJyU+cwHyBwdCYCOjnCT/R/aR8rTaAkHRJawtAAqKZj0yNVUQMY8fvxYArRBxCrlMaQJkEAMjl2xwFL7TemxaMh6FkAW0VHwJAcoHtJauyFUaKZPaDafa34noIoNs3SnxNHR41GOjt44OQofRkH3VHRIddakxu7hMPBuDnhiLSkgjcnfargY9DjK2LtwWErXpadHFTxIGvXSgpl5RCpVcxl/PN+G2cp3qQSJAnKDGravpsGNgFLpYEcJtR/kUu/RiTLfhtkqELJUAiLMxznVUV9ElmeG7DRsaeptAwnfMXUaoLZvNVbEYd7Ezob5HLmhP9/6GmC0BJFQTIp5hhwgIaDrq/nTWFDdhpkN05DQGxySICCKCE0ae/nQTR8JEDoBm6/LfDPpsVI2DwKQjo5ERKV9jDIghgRPCoQD2vw+QD5I5zoaBeSyJ0BhJEtx23VEiGjo6F6MFh8aB9SVBJq7B0Qj3HoFh/roSoBQmGXXEOg4DbrcVgBdxSIzs6EMIGdiAORJgQmAFzs7KjQ+FV4QFdOWPSgn6FsNysdbBwCt8CzJw1MbZ3BpRUBZNbQKnAuQKRHSb3/B1hjjZtrebdjglgVUBQcRkPIM0Jb65X5+FPvw3JaVmwwVASFOJvar2NvS6G84pQY6IJiF6gd2Hlk2ByBPqe8WPH65vMVpTkRCkgCoiU+MyjArmQ/lACGMtYCuTbabtT1xCA4MjtojpFV+OZHlo6hDcIAQbT4ztQ7Qpot99l0GT+UTh3EVlLxqTFjRkETm2PmgW6GZ2i+3fiKgWe5RZJeTLhkRJDTL1h+oM3GhUAAUNGH98wGyX4zN40GoYWJT4HxbWs4yODIg0JvSkdr4OWLQzZNpMUggpLYb7SWVARlImw1Z0hHHsB54WhugjVxMvJFchyIlA0oZQLwEQoQCw6iIkTitAZDfk57p3R2MTSbEVDmSJqm2dUraBqD09o4eQLzOSGb8kI3BAFL7aj/WVgUIZmoDVCHlpYaUPAoDxEmUe5tOCBU5pAuGzFqX+BQAuRV9zotaAcHLyR5FEQOrDinjWbQq1co1UeC6WUBXNjzfnXbFoA5AYhMxJEipMEtqAgQDVz2gxg2zLCB8Wd1hKQYRoYhK+0hQKwcI98IpgN6enNhnMisfycR1xSOQ2AgIUmrIobqQS0WjWCJVCYh0sctz+3/Fqyni5dBwNazSNUQiJFSwsFbjF1AARBpTH6THn5uveDWFr4bf5YpGkn4RJ9zpqiRaQl4ZEMxMW1M/zG+61snJecWrKVw99I4Ag94OMQkQhuQXbqxUdEzuZ0BWgkTDbmYovZoCvXnh61fWi8qvpvAXgt7EzdaOUxHhPQA2Z5C7GzIzxkHVK5q3Oy7PK15NMdaYAzQHoZER3nFTVyZglU+aH093ABqu2GbH5Xn7qynA1ZsXENlLkiHhq8KNBJrNgPDDLLZvffzb645XUxgcQ4c0XswHCfY2uDFJxibKYQ02G9oBEdnMg6pf0TUIq3kKCEzSRKnGF7+FRNuS9AYAWD81ch5AkkwCVAugHhH5EgBBEkGAXb1CM3YCiFjaLLls6S4AAdKRr1cGpNMZsoDsIGaf1sjdqJhdash8mqeKLMqriMBdSAIkfxsAaz6jVgno5slmCn1xnP9uQwUk1doABQGqzujuvElECCJ0J+kMgC6O/X98sN8SoMmDmi0A36YFJtzwXslo2gRAo+NYQF3bHazWuSAU+BgwqNFZErpXcpWe2crxKQGy0r0fxPkkUPO4iyIjABB8VggS6HBvdDIlQOm1C11dTH6gDgLK7QdNozfWuAJ8HJSICAIS4lIloHEzaCh8AT0NkMBhAP9XAxEBhZtt0A22MSTBO01XUvguAxou3JOqN0/6hnnpHu1ESl7N9ohQRkqKoVkLSRCQDCk3UXTfG6rP8zYCwg1JCu088LGUmBYWAwSUbnWPkCggTmlHM+lgNGzCGiV0AsopDv65eU+IYMBRW8W0C0DAZASoFU6boHolR1mh+0lkhZ0AgteUmz+RQhUpW1kM1gjAGxySdgrIoD0Gg3uHyqcVXIV6qHclPMM2Pi+hQ9rJd/PoQhY41OJR8/N0aIwRAa3wRsnOAYFJNb2o8wvZrCTGGGMkQDQkVQOa8iZOaB9KhR8nQciqjMP/mtZrwqgmAoKUagBNexOnxAfJOk+Jz4/x3wqGwmR1/JADhBZuO7jLtawgewBLrwKEdaTlzoAQiYAgpBmfWe0FJGLIABJgQq7gD31mFwKykgPkIc35zKrS/qICvfoKHz3y4KajpNCL8akkeUDFGDTr65LLgHCbFUDiMJ4yEUAGf+VF+YxP/fUDqnkTp/plf+aFBtLNDkR4sqoXTgg3JWA1Td5kJH/zwmxBGl5FQQH7iFdW/YQm4xmPNOsq7DgbY7S1WtGD5gQU7Iz2rkEKgzIIjZNcCE3UicSCskb63H0xqONNnLBu1rIBehNmQQBwR0HlCKAG4ksqNxmQjKjl5oUJgNgSAzdX9AwJQUYd1xI+1QwUgGOzB5WlbcsVTXNy/iBOegad0IAKTGpVI6nBfnZfgGBH8gqggTUkUinhmNwfJpRWsl8k2ADoypiz3Lc+PYCwgkwi4yYwKgv3ydPsun2ikV5qAV189p/Ts+ySte55MfIBKtTwUeIWBzRwNd0+ZCSTyiB9ZqdCfd+slu9NWpNLrftPbDlJZYDQ1ZgEyMo9AxJ8B/iLdEICNMQTpLIqPuX1UOkmzv9YRpMeqNPs1DBkADFgGJxQWfWWS1lDDtLXtsK+x6FKd7c189E1KwApRkwGVJT5AdXwGAAWBIhWhvbkckaWmzH741A1Mcj/L+KgI5awYKHHeusOEhD/6pW2ep0YYjVhoSZX0w8o6mduf4kWTJoHFQBR70CAJLOhrFHfygDCY52kIFWENLa3H6TxQfcH6oCg/2iRaygCCiVQnWmAKmTqlqsKiCr4DzIgcz+Arh69cDseE4d51YLYfjGopF4BzuddqGRDA6CaGHS94WPXYRMnimr9KPjADqQPbYKvZWIct4FrThjF3I79zZOzmW7iJII9hdgtewnBiF0KZIUYtjmTdhHaetHEYV6WekADhQFOg05KVvE1NlQpFAA559kGoBCD/Ec03NOAlNqcAI0ZICA2lyzbUKOQ62Jn/u6Fiy10MaeAuwboL/7PGtKKWoAW2lFCCtU2lBRyE8XPvnMh6Dr3hqUpgGBLBEA0Vns11M9iVtDHdhWD3A/XPN04EbgP2L5UYNITh0hUQMiPqFPQJRo93WbDzKv5tyfnNW9eKNYNmpZS2PqUAiJeIsGjLrTNYV6Q21///rzizQvFun2bQAyi7gA6kUGdDRUhACIphYmi5nhSMyoAffzrP1/WvHmh5lYGcj9BSAnNw1omPd8q3/Eg3AjBq+T1Soqq1Dz1/Mx2r/KbFwh6LsGDWAq6/PEzcRXD1v/ijgiyAfgktyMv9R60cZ2PyINgtkzJghi2myF0l3jM+MhrslR0KoTsBxnWw+YEZF8fdHLybFIMQgbJgJIaB4Q1CSipksKGWQWftlHMelDHmxegQcAkFVD4uwYXXgKEv1mTKllLiQUjFY1qQFPmQTogsAwFgMAlTlkxID4PEgFphPbhWw0gGqCYinqPQFBQYv3kkAEpMUj0Dj1AED/LVXJwgGQFCZBR248WYwVz8Uyix8g98yB19EbZkwM1AOpU2JsYJKwWGAJ02A9ItqFUxL0DIi2Xlun4sIKP5sUN+yF7CyisZjmgluYdGiBtJi24hjEmzIPSuRicM1XU2LC/gDQF2lkCoPQZnZkEaJ9jULWCCih2P0P2A+a3gWjcHyAx1IL26xEcTRTabUAllKy8P0CZwUggGLQBID7a1dngMh0goEIENXhND6ZNrTboucQi9gVQbQyOWCYCmnHDTJTZY1DDIIUBtdtwKICwNAPKbgvmSzhAQNgb1tnG1+yYlhEXCtgPQNFOEk/oUmNCFd0KOwckDFIJQwugqlnM4QGSQkwXoLpZzEMDFFajUUElZD4lQLmFgkbowQJq3c3JAjqIGFT73X+njI4in9hy1UT2Yx7EFbLj/CF40IS667tY10piHoWDAKSOZZ8qoIBjASRL5LEe2NxxpirqFfYeUHZXYgEUjueuol5hHwHBGNRZwnwKewlonxQWQLUaewsoN5VeABX2jRdAC6CiwgKopLDEoP1WWADVaiyAChoLoILGAqigsQAqaCyAChoLoIJGL6BPR/oA5dg9iBJYEQugQhELoEIR8wF6oLIAKsgCqCALoIIsgAoyHZB7b8XtVycn9CUEbSVIrzFoK+Hjy5MvXvWWEJvx5WtcxGRA72yR9u0nt1+/wi9jaiphkF7n1FbCpXtVTV8JqRlvSRFTAV1+8Y8N+ne2uMtz/CKUphLE1zk1lWCzbqSrBF+Ee9PN716jImbqYtay377Cr9JpK4G+zqm5hNtv/m67WGcJrgjvQaiI2QDZt8TglzG1lSC9zqmphNuvHN/OEkYjxuCDipgL0PvfPBumXX/hdU6tJUzw4rGIr18N7758vQ0Pspevt/+7LOLrnJpKeP8H16zOElwe7zpbiEEjH/IypqYSBul1Tm0lXJ6PfthVAvQgVMQ8gMbrf36/86BNVjqJaS3i3QmbSi0z6YIsgAqyACrIAqggC6CCLIAKkgP04bm736v4G+sdef77LykXfdO3f3m8cpYX9uH52c2PX9AiaJJmxHBlHr2w/1BiHtBT93/uRw/78lCbx1zsXegRkHiWF3bFr0vmBf3UCPtWf/7jNGVANb9o05pHBsR+axoBUn+JOhZ297MX7GQDIHvMva0CkLsw1s1tXXen5tGfP//25vM/bg5DYvhL8rgfH386XByPx+7QcbOfnrpcx7Am+7+z0P5nK/oTBRTOjtWPBY6FuTo3bmtP/vjPT1xFvoioD809HlK+Md0e//CJPYP0agBdf/ad+72EjQH2Z1vuTm1pDtqYGP6SPOMPUfzgW3sRQ3RwPyswErC5wi9y+k40NtCdDhXJZ131ocBw1cefTrEnN5qbeqOtXh+aa21L+cb04EFYrwrQ2Ehbqvt7ZQGdefcNib5TgTz/+27wbT2zvyINf0ja2uFy4TC8OQgIQkXyWVd9KDA01FkQT6YiQlIwM+iHvzA9Ghb1Kj3I//jYU+cntrU2c0z0f0me8ScTN4PCpnvZHneRBjdnhytqNHLMdXc6XkabGiqSz47ZfIEMECkiJAUzQ1gK+UJ6AIT1agBtgkj4vR8MCCbyPHenj8Yabz7/9/hD7RuHHY2TAcUxWQQEzyYmJg3jRUDeTAbIp0dASK9yFLv2s4PQL1zhMRFMHWAe50TuN6d+EbqX74gOEPgdIY4Ad0ANEOoyFBCwFZnLuhhIj4bF85XzIPffJicIfENMDH9JHpty88QmX9mu4Oz1Rtm28CBt/7cV2B8/uTs9JkEanh0b7AuMU4qLpwhQKCIkJXOPhxCoB2BsCtJQr2Im/TR8tm1NQydIDH9Jnk2MePQXd1nd2OUj0tgWP5oes5rsaPvLn5Fhnp4dqw8FXvhirsMw/wLNFKLHQXOPh5TPp8d5ENLrWYtdt0ytrcABbIsiTRQnSyOg8DN2bXKV+1XAGUVYakyWVg+6al292m7R6nG98uF5w6KoUpbtjoIsgAqyACrIAqggC6CCLIAKsgAqyP8BDTsRmLKajhIAAAAASUVORK5CYII=" /><!-- --></p>
-<p>We can see that the effects are in opposite directions: positive for <em>Date</em> (direct) and negative for <em>DD</em> (indirect). This is because trees at higher latitudes require fewer degree days to break buds (cooler climate), break buds later, and grow more in the growing season than trees at lower latitudes. Thus <em>DD</em> negatively affects <em>Growth</em> by reducing the <em>Date</em> to first bud burst. This is just a toy example from the SEM to illustrate contrasting effects of similar magnitude. <em>DD</em> in this case is acting as a proxy for latitude (high <em>DD</em> = low latitude).</p>
-<p>It’s also evident from the plots that there is a huge amount of scatter around the fits. This is due to the random effects (‘site’ and ‘tree’) accounting for most variation in tree growth. We can get a rough breakdown of this using R-squared, here via <a href="https://murphymv.github.io/semEff/reference/R2.html"><code>R2()</code></a> (squared multiple correlation):</p>
+<p>We can see that the effects are in opposite directions: positive for
+<em>Date</em> (direct) and negative for <em>DD</em> (indirect). This is
+because trees at higher latitudes require fewer degree days to break
+buds (cooler climate), break buds later, and grow more in the growing
+season than trees at lower latitudes. Thus <em>DD</em> negatively
+affects <em>Growth</em> by reducing the <em>Date</em> to first bud
+burst. This is just a toy example from the SEM to illustrate contrasting
+effects of similar magnitude. <em>DD</em> in this case is acting as a
+proxy for latitude (high <em>DD</em> = low latitude).</p>
+<p>It’s also evident from the plots that there is a huge amount of
+scatter around the fits. This is due to the random effects (‘site’ and
+‘tree’) accounting for most variation in tree growth. We can get a rough
+breakdown of this using R-squared, here via <a href="https://murphymv.github.io/semEff/reference/R2.html"><code>R2()</code></a>
+(squared multiple correlation):</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">r2_marg =</span> <span class="fu">R2</span>(mod, <span class="at">re.form =</span> <span class="cn">NA</span>)[[<span class="dv">1</span>]],</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">r2_cond =</span> <span class="fu">R2</span>(mod)[[<span class="dv">1</span>]])</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    r2_marg    r2_cond </span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.04814953 0.79383672</span></span></code></pre></div>
-<p>Fixed (‘marginal’) effects account for only about 5% of variation, compared to almost 80% when adding all random effects (‘conditional’). We can also condition on individual random effects, showing that ‘tree’ accounts for most random variation:</p>
+<p>Fixed (‘marginal’) effects account for only about 5% of variation,
+compared to almost 80% when adding all random effects (‘conditional’).
+We can also condition on individual random effects, showing that ‘tree’
+accounts for most random variation:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">r2_site =</span> <span class="fu">R2</span>(mod, <span class="at">re.form =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> site)[[<span class="dv">1</span>]],</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">r2_tree =</span> <span class="fu">R2</span>(mod, <span class="at">re.form =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> tree)[[<span class="dv">1</span>]])</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   r2_site   r2_tree </span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.3081469 0.6068561</span></span></code></pre></div>
 <div id="references" class="section level4 unnumbered">
 <h4 class="unnumbered">References</h4>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-shipleyConfirmatoryPathAnalysis2009" class="csl-entry">
-Shipley, Bill. 2009. <span>“Confirmatory Path Analysis in a Generalized Multilevel Context.”</span> <em>Ecology</em> 90 (2): 363–68. <a href="https://doi.org/bqd43d">https://doi.org/bqd43d</a>.
+<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="ref-shipley2009" class="csl-entry">
+Shipley, B. (2009). Confirmatory path analysis in a generalized
+multilevel context. <em>Ecology</em>, <em>90</em>(2), 363–368. <a href="https://doi.org/bqd43d">https://doi.org/bqd43d</a>
 </div>
 </div>
 </div>
