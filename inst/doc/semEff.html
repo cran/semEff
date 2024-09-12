@@ -27,6 +27,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
   }
 });
 </script>
+<style type="text/css">@layer htmltools {
+.html-fill-container {
+display: flex;
+flex-direction: column;
+
+min-height: 0;
+min-width: 0;
+}
+.html-fill-container > .html-fill-item {
+
+flex: 1 1 auto;
+min-height: 0;
+min-width: 0;
+}
+.html-fill-container > :not(.html-fill-item) {
+
+flex: 0 0 auto;
+}
+}
+</style>
 <script>(function() {
   // If window.HTMLWidgets is already defined, then use it; otherwise create a
   // new object. This allows preceding code to set options that affect the
@@ -316,20 +336,18 @@ document.addEventListener('DOMContentLoaded', function(e) {
       document.body.style.height = "100%";
       document.documentElement.style.width = "100%";
       document.documentElement.style.height = "100%";
-      if (cel) {
-        cel.style.position = "absolute";
-        var pad = unpackPadding(sizing.padding);
-        cel.style.top = pad.top + "px";
-        cel.style.right = pad.right + "px";
-        cel.style.bottom = pad.bottom + "px";
-        cel.style.left = pad.left + "px";
-        el.style.width = "100%";
-        el.style.height = "100%";
-      }
+      cel.style.position = "absolute";
+      var pad = unpackPadding(sizing.padding);
+      cel.style.top = pad.top + "px";
+      cel.style.right = pad.right + "px";
+      cel.style.bottom = pad.bottom + "px";
+      cel.style.left = pad.left + "px";
+      el.style.width = "100%";
+      el.style.height = "100%";
 
       return {
-        getWidth: function() { return cel.offsetWidth; },
-        getHeight: function() { return cel.offsetHeight; }
+        getWidth: function() { return cel.getBoundingClientRect().width; },
+        getHeight: function() { return cel.getBoundingClientRect().height; }
       };
 
     } else {
@@ -337,8 +355,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
       el.style.height = px(sizing.height);
 
       return {
-        getWidth: function() { return el.offsetWidth; },
-        getHeight: function() { return el.offsetHeight; }
+        getWidth: function() { return cel.getBoundingClientRect().width; },
+        getHeight: function() { return cel.getBoundingClientRect().height; }
       };
     }
   }
@@ -562,8 +580,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
           elementData(el, "initialized", true);
           if (bindingDef.initialize) {
-            var result = bindingDef.initialize(el, el.offsetWidth,
-              el.offsetHeight);
+            var rect = el.getBoundingClientRect();
+            var result = bindingDef.initialize(el, rect.width, rect.height);
             elementData(el, "init_result", result);
           }
         }
@@ -605,29 +623,30 @@ document.addEventListener('DOMContentLoaded', function(e) {
       forEach(matches, function(el) {
         var sizeObj = initSizing(el, binding);
 
+        var getSize = function(el) {
+          if (sizeObj) {
+            return {w: sizeObj.getWidth(), h: sizeObj.getHeight()}
+          } else {
+            var rect = el.getBoundingClientRect();
+            return {w: rect.width, h: rect.height}
+          }
+        };
+
         if (hasClass(el, "html-widget-static-bound"))
           return;
         el.className = el.className + " html-widget-static-bound";
 
         var initResult;
         if (binding.initialize) {
-          initResult = binding.initialize(el,
-            sizeObj ? sizeObj.getWidth() : el.offsetWidth,
-            sizeObj ? sizeObj.getHeight() : el.offsetHeight
-          );
+          var size = getSize(el);
+          initResult = binding.initialize(el, size.w, size.h);
           elementData(el, "init_result", initResult);
         }
 
         if (binding.resize) {
-          var lastSize = {
-            w: sizeObj ? sizeObj.getWidth() : el.offsetWidth,
-            h: sizeObj ? sizeObj.getHeight() : el.offsetHeight
-          };
+          var lastSize = getSize(el);
           var resizeHandler = function(e) {
-            var size = {
-              w: sizeObj ? sizeObj.getWidth() : el.offsetWidth,
-              h: sizeObj ? sizeObj.getHeight() : el.offsetHeight
-            };
+            var size = getSize(el);
             if (size.w === 0 && size.h === 0)
               return;
             if (size.w === lastSize.w && size.h === lastSize.h)
@@ -929,7 +948,6 @@ document.addEventListener('DOMContentLoaded', function(e) {
     return result;
   }
 })();
-
 </script>
 <script>/*
 Viz.js 1.8.2 (Graphviz 2.40.1, Expat 2.2.5, Emscripten 1.37.33)
@@ -1245,27 +1263,27 @@ color: #333333;
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -1279,55 +1297,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -1361,25 +1378,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <style type="text/css">
-/* for pandoc --citeproc since 2.11 */
+
 div.csl-bib-body { }
 div.csl-entry {
-  clear: both;
+clear: both;
+margin-bottom: 0em;
 }
 .hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+margin-left:2em;
+text-indent:-2em;
 }
 div.csl-left-margin {
-  min-width:2em;
-  float:left;
+min-width:2em;
+float:left;
 }
 div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
+margin-left:2em;
+padding-left:1em;
 }
 div.csl-indent {
-  margin-left: 2em;
+margin-left: 2em;
 }
 </style>
 
@@ -1580,16 +1598,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <p><code>semEff</code> automates calculation of effects for structural
-equation models (SEM) which use local estimation (‘piecewise’; see <span class="citation">Lefcheck (<a href="#ref-lefcheck2016" role="doc-biblioref">2016</a>)</span>). Here’s a short example using an
-SEM testing fire impacts on plant species richness (<span class="citation">Grace &amp; Keeley (<a href="#ref-grace2006" role="doc-biblioref">2006</a>)</span>; data provided with the
+equation models (SEM) which use local estimation (‘piecewise’; see <span class="citation">Lefcheck (<a href="#ref-lefcheck2016">2016</a>)</span>). Here’s a short example using
+an SEM testing fire impacts on plant species richness (<span class="citation">Grace &amp; Keeley (<a href="#ref-grace2006">2006</a>)</span>; data provided with the
 <code>piecewiseSEM</code> package).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;semEff&quot;, &quot;piecewiseSEM&quot;))</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semEff)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(keeley, <span class="at">package =</span> <span class="st">&quot;piecewiseSEM&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># install.packages(c(&quot;semEff&quot;, &quot;piecewiseSEM&quot;))</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(semEff)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">data</span>(keeley, <span class="at">package =</span> <span class="st">&quot;piecewiseSEM&quot;</span>)</span></code></pre></div>
 <p>Let’s have a look at the data. Observations represent a range of <a href="https://rdrr.io/cran/piecewiseSEM/man/keeley.html">vegetation
 parameters</a> measured in 90 post-fire study plots after wildfires in
 southern California in 1993:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(keeley))</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(keeley))</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1667,91 +1685,92 @@ southern California in 1993:</p>
 </tbody>
 </table>
 <p>An SEM fit to these data in <span class="citation">Grace &amp; Keeley
-(<a href="#ref-grace2006" role="doc-biblioref">2006</a>)</span> tests
-the influence of landscape vs. local factors in the response of plants
-to fire, or more specifically, the direct vs. indirect effects of
-landscape location (distance from coast) on plant species richness via
-other biotic and abiotic mediators (see the paper for further details).
-We can reproduce this SEM (roughly) in a piecewise fashion by fitting a
-separate linear model for each observed response variable:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>keeley.sem <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(age <span class="sc">~</span> distance, <span class="at">data =</span> keeley),</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(hetero <span class="sc">~</span> distance, <span class="at">data =</span> keeley),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(abiotic <span class="sc">~</span> distance, <span class="at">data =</span> keeley),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(firesev <span class="sc">~</span> age, <span class="at">data =</span> keeley),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(cover <span class="sc">~</span> firesev, <span class="at">data =</span> keeley),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(rich <span class="sc">~</span> distance <span class="sc">+</span> hetero <span class="sc">+</span> abiotic <span class="sc">+</span> cover, <span class="at">data =</span> keeley)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+(<a href="#ref-grace2006">2006</a>)</span> tests the influence of
+landscape vs. local factors in the response of plants to fire, or more
+specifically, the direct vs. indirect effects of landscape location
+(distance from coast) on plant species richness via other biotic and
+abiotic mediators (see the paper for further details). We can reproduce
+this SEM (roughly) in a piecewise fashion by fitting a separate linear
+model for each observed response variable:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>keeley.sem <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">lm</span>(age <span class="sc">~</span> distance, <span class="at">data =</span> keeley),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">lm</span>(hetero <span class="sc">~</span> distance, <span class="at">data =</span> keeley),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">lm</span>(abiotic <span class="sc">~</span> distance, <span class="at">data =</span> keeley),</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">lm</span>(firesev <span class="sc">~</span> age, <span class="at">data =</span> keeley),</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="fu">lm</span>(cover <span class="sc">~</span> firesev, <span class="at">data =</span> keeley),</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="fu">lm</span>(rich <span class="sc">~</span> distance <span class="sc">+</span> hetero <span class="sc">+</span> abiotic <span class="sc">+</span> cover, <span class="at">data =</span> keeley)</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>)</span></code></pre></div>
 <p>And visualise it using <code>piecewiseSEM:::plot.psem()</code>
 (wrapper for <code>DiagrammeR::render_graph()</code>), which helps to
 clarify the directions of causal pathways in the system:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>piecewiseSEM<span class="sc">:::</span><span class="fu">plot.psem</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  piecewiseSEM<span class="sc">::</span><span class="fu">as.psem</span>(keeley.sem),</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">node_attrs =</span> <span class="fu">data.frame</span>(<span class="at">shape =</span> <span class="st">&quot;rectangle&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">fillcolor =</span> <span class="st">&quot;grey&quot;</span>),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">layout =</span> <span class="st">&quot;tree&quot;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<div id="htmlwidget-1afa6c3db7973ff3682d" style="width:288px;height:288px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1afa6c3db7973ff3682d">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"age\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"0,4!\"] \n  \"2\" [label = \"hetero\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"1,4!\"] \n  \"3\" [label = \"abiotic\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"2,2!\"] \n  \"4\" [label = \"firesev\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"0,3!\"] \n  \"5\" [label = \"cover\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"0,2!\"] \n  \"6\" [label = \"rich\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"2,1!\"] \n  \"7\" [label = \"distance\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"1.5,5!\"] \n\"7\"->\"1\" [style = \"solid\", color = \"black\", label = \" -0.278 \"] \n\"7\"->\"2\" [style = \"solid\", color = \"black\", label = \" 0.346 \"] \n\"7\"->\"3\" [style = \"solid\", color = \"black\", label = \" 0.46 \"] \n\"1\"->\"4\" [style = \"solid\", color = \"black\", label = \" 0.454 \"] \n\"4\"->\"5\" [style = \"solid\", color = \"black\", label = \" -0.437 \"] \n\"7\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.283 \"] \n\"2\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.338 \"] \n\"3\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.25 \"] \n\"5\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.287 \"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>piecewiseSEM<span class="sc">:::</span><span class="fu">plot.psem</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  piecewiseSEM<span class="sc">::</span><span class="fu">as.psem</span>(keeley.sem),</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">node_attrs =</span> <span class="fu">data.frame</span>(<span class="at">shape =</span> <span class="st">&quot;rectangle&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">fillcolor =</span> <span class="st">&quot;grey&quot;</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">layout =</span> <span class="st">&quot;tree&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-f68480334c7aeb90d77c" style="width:288px;height:288px;"></div>
+<script type="application/json" data-for="htmlwidget-f68480334c7aeb90d77c">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"age\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"0,4!\"] \n  \"2\" [label = \"hetero\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"1,4!\"] \n  \"3\" [label = \"abiotic\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"2,2!\"] \n  \"4\" [label = \"firesev\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"0,3!\"] \n  \"5\" [label = \"cover\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"0,2!\"] \n  \"6\" [label = \"rich\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"2,1!\"] \n  \"7\" [label = \"distance\", shape = \"rectangle\", color = \"black\", fillcolor = \"#C0C0C0\", fontcolor = \"#000000\", pos = \"1.5,5!\"] \n\"7\"->\"1\" [style = \"solid\", color = \"black\", label = \" -0.278 \"] \n\"7\"->\"2\" [style = \"solid\", color = \"black\", label = \" 0.346 \"] \n\"7\"->\"3\" [style = \"solid\", color = \"black\", label = \" 0.46 \"] \n\"1\"->\"4\" [style = \"solid\", color = \"black\", label = \" 0.454 \"] \n\"4\"->\"5\" [style = \"solid\", color = \"black\", label = \" -0.437 \"] \n\"7\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.283 \"] \n\"2\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.338 \"] \n\"3\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.25 \"] \n\"5\"->\"6\" [style = \"solid\", color = \"black\", label = \" 0.287 \"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Now, to calculate effects, we first bootstrap and save the
 standardised direct effects:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  keeley.sem.boot <span class="ot">&lt;-</span> <span class="fu">bootEff</span>(keeley.sem, <span class="at">R =</span> <span class="dv">100</span>, <span class="at">seed =</span> <span class="dv">13</span>, <span class="at">parallel =</span> <span class="st">&quot;no&quot;</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   10.86    0.18   11.27</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">system.time</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  keeley.sem.boot <span class="ot">&lt;-</span> <span class="fu">bootEff</span>(keeley.sem, <span class="at">R =</span> <span class="dv">100</span>, <span class="at">seed =</span> <span class="dv">13</span>, <span class="at">parallel =</span> <span class="st">&quot;no&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;    7.61    0.08    7.69</span></span></code></pre></div>
 <p>Note that here we use only 100 reps to save time, where typically we
 should use a lot more for greater accuracy of confidence intervals
 (e.g. 1,000–10,000+). Using the bootstrapped estimates we can now
 calculate direct, indirect, and total effects:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(keeley.sem.eff <span class="ot">&lt;-</span> <span class="fu">semEff</span>(keeley.sem.boot))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Piecewise SEM with:</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   * 1 exogenous vs. 6 endogenous variable(s)</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   * 9 direct vs. 8 indirect effect(s)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Variables:</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             Category   Predictor Mediator Response   Dir. Eff. Ind. Eff.  </span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             --------   --------- -------- --------   --------- ---------  </span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  distance | Exog.    |     Y        N        N     |         -         - |</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  age      | Endog.   |     Y        Y        Y     |         1         0 |</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  hetero   | Endog.   |     Y        Y        Y     |         1         0 |</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  abiotic  | Endog.   |     Y        Y        Y     |         1         0 |</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  firesev  | Endog.   |     Y        Y        Y     |         1         1 |</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  cover    | Endog.   |     Y        Y        Y     |         1         2 |</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  rich     | Endog.   |     N        N        Y     |         4         5 |</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use summary() for effects and confidence intervals for endogenous variables.</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>(keeley.sem.eff <span class="ot">&lt;-</span> <span class="fu">semEff</span>(keeley.sem.boot))</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; Piecewise SEM with:</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;   * 1 exogenous vs. 6 endogenous variable(s)</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt;   * 9 direct vs. 8 indirect effect(s)</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; Variables:</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;             Category   Predictor Mediator Response   Dir. Eff. Ind. Eff.  </span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt;             --------   --------- -------- --------   --------- ---------  </span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt;  distance | Exog.    |     x        -        -     |         -         - |</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;  age      | Endog.   |     x        x        x     |         1         0 |</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt;  hetero   | Endog.   |     x        x        x     |         1         0 |</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;  abiotic  | Endog.   |     x        x        x     |         1         0 |</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;  firesev  | Endog.   |     x        x        x     |         1         1 |</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt;  cover    | Endog.   |     x        x        x     |         1         2 |</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt;  rich     | Endog.   |     -        -        x     |         4         5 |</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; Use summary() for effects and confidence intervals for endogenous variables.</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; See ?getEff() for extracting (unformatted) effects.</span></span></code></pre></div>
 <p>Let’s examine effects for the final response variable, plant species
 richness, which has four direct and five indirect paths leading to
 it:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(keeley.sem.eff, <span class="at">response =</span> <span class="st">&quot;rich&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SEM direct, summed indirect, total, and mediator effects:</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rich (6/6):</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       Effect     Bias   Std. Err.   Lower CI Upper CI    </span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       ------   ------   ---------   -------- --------    </span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  DIRECT    distance |  0.233 |  0.016 |     0.065 |    0.089    0.351 | *</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            hetero   |  0.301 | -0.009 |     0.072 |    0.168    0.447 | *</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            abiotic  |  0.219 | -0.014 |     0.078 |    0.080    0.401 | *</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            cover    |  0.267 | -0.015 |     0.082 |    0.085    0.446 | *</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          </span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  INDIRECT  distance |  0.220 | -0.012 |     0.047 |    0.139    0.349 | *</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            age      | -0.053 |  0.002 |     0.025 |   -0.145   -0.012 | *</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            firesev  | -0.117 |  0.007 |     0.045 |   -0.224   -0.029 | *</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          </span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  TOTAL     distance |  0.453 |  0.004 |     0.045 |    0.340    0.524 | *</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            age      | -0.053 |  0.002 |     0.025 |   -0.145   -0.012 | *</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            hetero   |  0.301 | -0.009 |     0.072 |    0.168    0.447 | *</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            abiotic  |  0.219 | -0.014 |     0.078 |    0.080    0.401 | *</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            firesev  | -0.117 |  0.007 |     0.045 |   -0.224   -0.029 | *</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            cover    |  0.267 | -0.015 |     0.082 |    0.085    0.446 | *</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          </span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  MEDIATORS age      |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            hetero   |  0.104 | -0.003 |     0.031 |    0.046    0.186 | *</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            abiotic  |  0.101 | -0.008 |     0.037 |    0.032    0.184 | *</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            firesev  | -0.038 |  0.001 |     0.017 |   -0.083   -0.008 | *</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            cover    | -0.155 |  0.008 |     0.061 |   -0.302   -0.037 | *</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">summary</span>(keeley.sem.eff, <span class="at">response =</span> <span class="st">&quot;rich&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; SEM direct, summed indirect, total, and mediator effects:</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; Response &#39;rich&#39; (6/6):</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;                        Effect     Bias   Std. Err.   Lower CI Upper CI    </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt;                        ------   ------   ---------   -------- --------    </span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;  DIRECT:    distance |  0.233 |  0.016 |     0.065 |    0.089    0.351 | *</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;             hetero   |  0.301 | -0.009 |     0.072 |    0.168    0.447 | *</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt;             abiotic  |  0.219 | -0.014 |     0.078 |    0.080    0.401 | *</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt;             cover    |  0.267 | -0.015 |     0.082 |    0.085    0.446 | *</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt;                      |        |        |           |                   |  </span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt;  INDIRECT:  distance |  0.220 | -0.012 |     0.047 |    0.139    0.349 | *</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt;             age      | -0.053 |  0.002 |     0.025 |   -0.145   -0.012 | *</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt;             firesev  | -0.117 |  0.007 |     0.045 |   -0.224   -0.029 | *</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt;                      |        |        |           |                   |  </span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt;  TOTAL:     distance |  0.453 |  0.004 |     0.045 |    0.340    0.524 | *</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt;             age      | -0.053 |  0.002 |     0.025 |   -0.145   -0.012 | *</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt;             hetero   |  0.301 | -0.009 |     0.072 |    0.168    0.447 | *</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;             abiotic  |  0.219 | -0.014 |     0.078 |    0.080    0.401 | *</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;             firesev  | -0.117 |  0.007 |     0.045 |   -0.224   -0.029 | *</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;             cover    |  0.267 | -0.015 |     0.082 |    0.085    0.446 | *</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;                      |        |        |           |                   |  </span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;  MEDIATORS: age      |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;             hetero   |  0.104 | -0.003 |     0.031 |    0.046    0.186 | *</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;             abiotic  |  0.101 | -0.008 |     0.037 |    0.032    0.184 | *</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt;             firesev  | -0.038 |  0.001 |     0.017 |   -0.083   -0.008 | *</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;             cover    | -0.155 |  0.008 |     0.061 |   -0.302   -0.037 | *</span></span></code></pre></div>
 <p>We can see that the standardised total effect of distance from coast
 on plant species richness is moderately high at 0.453 (CIs: 0.373,
 0.526), and is split almost equally between direct (0.233) and indirect
@@ -1764,27 +1783,27 @@ with <em>cover</em> having the strongest influence (-0.155). However,
 this considers all predictors in the system collectively – meaning that
 mediators are themselves counted as predictors. To focus only on the
 exogenous variable <em>distance</em>, let’s recalculate:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semEff</span>(keeley.sem.boot, <span class="at">predictor =</span> <span class="st">&quot;distance&quot;</span>),</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">response =</span> <span class="st">&quot;rich&quot;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SEM direct, summed indirect, total, and mediator effects:</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rich (6/6):</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       Effect     Bias   Std. Err.   Lower CI Upper CI    </span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       ------   ------   ---------   -------- --------    </span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  DIRECT    distance |  0.233 |  0.016 |     0.065 |    0.089    0.351 | *</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          </span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  INDIRECT  distance |  0.220 | -0.012 |     0.047 |    0.139    0.349 | *</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          </span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  TOTAL     distance |  0.453 |  0.004 |     0.045 |    0.340    0.524 | *</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          </span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  MEDIATORS age      |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            hetero   |  0.104 | -0.003 |     0.031 |    0.046    0.186 | *</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            abiotic  |  0.101 | -0.008 |     0.037 |    0.032    0.184 | *</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            firesev  |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            cover    |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">summary</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">semEff</span>(keeley.sem.boot, <span class="at">predictor =</span> <span class="st">&quot;distance&quot;</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">response =</span> <span class="st">&quot;rich&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>)</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; SEM direct, summed indirect, total, and mediator effects:</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; Response &#39;rich&#39; (6/6):</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt;                        Effect     Bias   Std. Err.   Lower CI Upper CI    </span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt;                        ------   ------   ---------   -------- --------    </span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt;  DIRECT:    distance |  0.233 |  0.016 |     0.065 |    0.089    0.351 | *</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt;                      |        |        |           |                   |  </span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt;  INDIRECT:  distance |  0.220 | -0.012 |     0.047 |    0.139    0.349 | *</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt;                      |        |        |           |                   |  </span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;  TOTAL:     distance |  0.453 |  0.004 |     0.045 |    0.340    0.524 | *</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;                      |        |        |           |                   |  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;  MEDIATORS: age      |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;             hetero   |  0.104 | -0.003 |     0.031 |    0.046    0.186 | *</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;             abiotic  |  0.101 | -0.008 |     0.037 |    0.032    0.184 | *</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt;             firesev  |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt;             cover    |  0.015 | -0.001 |     0.009 |    0.004    0.056 | *</span></span></code></pre></div>
 <p>Now we can see that <em>hetero</em> and <em>abiotic</em> are the
 important mediators for distance, while the relative influence of
 <em>cover</em> is much lower – weakened due to being part of a single
@@ -1817,9 +1836,9 @@ the system. In this particular case, it’s minimal, with standard errors
 of coefficients less than twice as large as they should be (checked
 using <a href="https://murphymv.github.io/semEff/reference/RVIF.html"><code>RVIF()</code></a>
 for the species richness model):</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">RVIF</span>(keeley.sem[[<span class="dv">6</span>]])</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; distance   hetero  abiotic    cover </span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1.214376 1.122211 1.139111 1.074784</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">RVIF</span>(keeley.sem[[<span class="dv">6</span>]])</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; distance   hetero  abiotic    cover </span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; 1.214376 1.122211 1.139111 1.074784</span></span></code></pre></div>
 <p>To use original standardised coefficients instead, specify
 <code>unique.eff = FALSE</code>, which can be passed to <a href="https://murphymv.github.io/semEff/reference/stdEff.html"><code>stdEff()</code></a>,
 <a href="https://murphymv.github.io/semEff/reference/bootEff.html"><code>bootEff()</code></a>,
@@ -1829,18 +1848,18 @@ inference, for comparison with the unique effects or with other
 standardised coefficients, or for other reasons.</p>
 <div id="references" class="section level4 unnumbered">
 <h4 class="unnumbered">References</h4>
-<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-grace2006" class="csl-entry">
 Grace, J. B., &amp; Keeley, J. E. (2006). A structural equation model
 analysis of postfire plant diversity in <span>California</span>
 shrublands. <em>Ecological Applications: A Publication of the Ecological
-Society of America</em>, <em>16</em>(2), 503–514. <a href="https://doi.org/d8gvwm">https://doi.org/d8gvwm</a>
+Society of America</em>, <em>16</em>(2), 503–514. <a href="https://doi.org/10.1890/1051-0761(2006)016%5B0503:ASEMAO%5D2.0.CO;2">https://doi.org/10.1890/1051-0761(2006)016%5B0503:ASEMAO%5D2.0.CO;2</a>
 </div>
 <div id="ref-lefcheck2016" class="csl-entry">
 Lefcheck, J. S. (2016). <span class="nocase">piecewiseSEM</span>:
 Piecewise structural equation modelling in <span>R</span> for ecology,
 evolution, and systematics. <em>Methods in Ecology and Evolution</em>,
-<em>7</em>(5), 573–579. <a href="https://doi.org/f8s8rb">https://doi.org/f8s8rb</a>
+<em>7</em>(5), 573–579. <a href="https://doi.org/10.1111/2041-210X.12512">https://doi.org/10.1111/2041-210X.12512</a>
 </div>
 </div>
 </div>
